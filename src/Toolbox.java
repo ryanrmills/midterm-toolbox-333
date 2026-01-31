@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
@@ -76,7 +77,20 @@ public class Toolbox {
     if (head == null) {
       throw new IllegalArgumentException("Head cannot be null.");
     }
-    return null; 
+    Map<Integer, Integer> countMap = new HashMap<>();
+
+    SingleNode current = head;
+    while (current != null){
+      if (!countMap.containsKey(current.data)){
+        countMap.put(current.data, 1);
+      } else {
+        countMap.put(current.data, countMap.get(current.data) + 1);
+      }
+
+      current = current.next;
+    }
+
+    return countMap;
   }
 
   /**
@@ -88,6 +102,16 @@ public class Toolbox {
   public static void removeNode(DoubleNode node) {
     if (node == null) {
       throw new IllegalArgumentException("Node cannot be null.");
+    }
+
+    if (node.prev == null && node.next != null){
+      node = node.next;
+    } else if (node.next == null && node.prev != null){
+      node = null;
+    } else if (node.next != null && node.prev != null){
+      node.prev.next = node.next;
+    } else {
+      node = null;
     }
     
   }
@@ -119,6 +143,10 @@ public class Toolbox {
       throw new IllegalArgumentException("Node and newNode cannot be null.");
     }
 
+    //I insert 'newNode' after 'node'?
+    SingleNode nextNode = node.next;
+    node.next = newNode;
+    newNode.next = nextNode;
   }
 
   /**
