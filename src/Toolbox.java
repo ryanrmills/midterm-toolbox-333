@@ -1,6 +1,9 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Stack;
 
 public class Toolbox {
 
@@ -105,11 +108,15 @@ public class Toolbox {
     }
 
     if (node.prev == null && node.next != null){
-      node = node.next;
+      node.next.prev = null;
     } else if (node.next == null && node.prev != null){
-      node = null;
+      node.prev.next = null;
     } else if (node.next != null && node.prev != null){
-      node.prev.next = node.next;
+      DoubleNode prevNode = node.prev;
+      DoubleNode nextNode = node.next;
+      prevNode.next = nextNode;
+      nextNode.prev = prevNode;
+      node = null;
     } else {
       node = null;
     }
@@ -118,7 +125,7 @@ public class Toolbox {
 
   /**
    * Finds the nth element in a singly linked list.
-   *
+   *7, 19, 3, 4
    * @param head the head node of the singly linked list
    * @param n the index of the element to find (0-based)
    * @return the nth node, or null if the index is out of bounds
@@ -128,7 +135,15 @@ public class Toolbox {
     if (head == null || n < 0) {
       throw new IllegalArgumentException("Head cannot be null and n cannot be negative.");
     }
-    return null; 
+    SingleNode current = head;
+    int count = 0;
+    while (current.next != null){
+      if (count == n) return current;
+      count++;
+      current = current.next;
+    }
+    if (count == n) return current;
+    return null;
   }
 
   /**
@@ -160,13 +175,30 @@ public class Toolbox {
    * Output: 5 -> 6 -> 4 -> 4
    * 
    * Explanation: 7 is greater than 6 and 20 is greater than 4, so these nodes are removed.
-   *
+   * 1 -> 2 -> 3 -> 4
    * @param head the head of the list
    * @throws IllegalArgumentException if the head is null
    */
   public static void removeGiants(SingleNode head) {
     if (head == null) {
       throw new IllegalArgumentException("Head cannot be null.");
+    }
+
+    SingleNode current = head;
+
+    if (current.next == null) {
+      current = null;
+      return;
+    }
+    
+    while (current.next.next != null){
+      if (current.next.data > current.next.next.data){
+        //remove big node
+        current.next = current.next.next;
+        current = current.next;
+      } else {
+        current = current.next;
+      }
     }
     
   }
@@ -190,7 +222,10 @@ public class Toolbox {
       if (queue == null) {
         throw new IllegalArgumentException("Queue cannot be null");
       }
-      
+      for (int i = 0; i < queue.size(); i++){
+        int modified = queue.poll() * 3;
+        queue.add(modified);
+      }
     }
 
 
@@ -216,6 +251,10 @@ public class Toolbox {
       throw new IllegalArgumentException("Queue cannot be null and k cannot be negative.");
     }
     
+    for (int i = 0; i < k; i++){
+      int num = queue.poll();
+      queue.add(num);
+    }
   }
 
   /**
@@ -237,7 +276,21 @@ public class Toolbox {
     if (input == null) {
       throw new IllegalArgumentException("Input string cannot be null.");
     }
-    return false;
+
+    Stack<Character> parenStack = new Stack<>();
+
+    for (char paren : input.toCharArray()){
+      if (paren == '('){
+        parenStack.push(paren);
+      } else {
+        if (!parenStack.isEmpty()){
+          parenStack.pop();
+        } else {
+          return false;
+        }
+      }
+    }
+    return parenStack.isEmpty();
   }
 
   /**
@@ -265,6 +318,25 @@ public class Toolbox {
     if (scores == null || scores.isEmpty()) {
       throw new IllegalArgumentException("Scares cannot be null or empty");
     }
-    return null;
+    int highest = Integer.MIN_VALUE;
+    String highestHolder = "";
+    for (String name : scores.keySet()){
+      if (scores.get(name) > highest){
+        highest = scores.get(name);
+        highestHolder = name;
+      }
+    }
+
+    //man i don't think this is efficient at all
+    List<String> highestNames = new ArrayList<>();
+    
+    for (Map.Entry<String, Integer> entry : scores.entrySet()){
+      if (entry.getValue() == highest){
+        highestNames.add(entry.getKey());
+      }
+    }
+    highestNames.sort(null);
+    highestHolder = highestNames.get(0);
+    return highestHolder;
   }
 }
